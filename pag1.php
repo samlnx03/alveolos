@@ -10,7 +10,8 @@
 $NOINFO=0; $RESULTADOS=1; $ERRORES=2; $ADVERTENCIAS=3; 
 $DEPURACION_BAJA=4; $DEPURACION_MEDIA=5; $DEPURACION_ALTA=6;
 
-$DEPURANDO=$DEPURACION_ALTA;
+//$DEPURANDO=$DEPURACION_BAJA;
+$DEPURANDO=$ADVERTENCIAS;
 
 $filename='Imagen1.bmp';
 $image = new Imagick();
@@ -73,17 +74,12 @@ for($c=1; $c<=6; $c++){ // columna
 		else
 			$respuesta[$np][$opcion]=0;
  */
-		if($DEPURANDO>=2){
-			echo "digito $c en posicion $r gris:$gris\n";
-			if($gris<100000){
-				$nsol.="$r";
-				echo "digito $c en posicion $r gris:$gris RELLENADO\n";
-			}
+		if($DEPURANDO>=$DEPURACION_BAJA) echo "digito $c en posicion $r gris:$gris\n";
+		if($gris<100000){
+			$nsol.="$r";
+			if($DEPURANDO>=$DEPURACION_BAJA) echo "digito $c en posicion $r gris:$gris RELLENADO\n";
 		}
-		elseif($DEPURANDO>=1){
-			if($gris<100000)
-				echo "digito $c en posicion $r gris:$gris RELLENADO\n";
-		}
+		
 	}
 }
 echo "*** numero de solicitud: $nsol\n";
@@ -229,12 +225,12 @@ for($np=1; $np<=56; $np++){
 			$respuesta [$np] = $respuesta[$np] | pow (2, ord($opcion) - ord ('A')); 
 		//else
 		//	$respuesta[$np][$opcion]=0;
-		if($DEPURANDO>=2){
+		if($DEPURANDO>=$DEPURACION_BAJA){
 			echo "preg $np, opcion $opcion ($x,$y) gris:$gris\n";
 			if($gris<100000)
 				echo "preg $np, opcion $opcion ($x,$y) gris:$gris RELLENADO\n";
 		}
-		elseif($DEPURANDO>=1){
+		elseif($DEPURANDO>=$DEPURACION_BAJA){
 			if($gris<100000)
 				echo "preg $np, opcion $opcion ($x,$y) gris:$gris RELLENADO\n";
 		}
