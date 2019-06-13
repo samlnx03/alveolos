@@ -13,7 +13,8 @@
 $NOINFO=0; $CONFIRMACIONES=1; $ERRORES=2; $ADVERTENCIAS=3; 
 $DEPURACION_BAJA=4; $DEPURACION_MEDIA=5; $DEPURACION_ALTA=6;
 
-$DEPURANDO=$DEPURACION_BAJA;
+//$DEPURANDO=$DEPURACION_BAJA;
+$DEPURANDO=$ADVERTENCIAS;
 
 $filename='Imagen2.bmp';
 $image = new Imagick();
@@ -111,8 +112,8 @@ for($preg=129,$nr=1; $nr<=24; $nr++,$preg+=97){  // numero de renglon, no exiten
 		//-----------------------------------
 	plotcentro($centroxy);
 	//if($DEPURANDO>=$DEPURACION_BAJA) print "renglon $nr, grupo $gpo, alveolo 1,  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
-		if($DEPURANDO>=$DEPURACION_BAJA) print "pregunta $preg\n";
-	if($DEPURANDO>=$DEPURACION_BAJA) print "*renglon ".($nr-1).", grupo ".(4-$gpo).", alveolo ".(4-1).",  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
+		if($DEPURANDO>=$DEPURACION_MEDIA) print "pregunta $preg\n";
+	if($DEPURANDO>=$DEPURACION_MEDIA) print "*renglon ".($nr-1).", grupo ".(4-$gpo).", alveolo ".(4-1).",  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
 
 	for($n=2; $n<=4; $n++){
 		// siguiente alveolo  n
@@ -126,15 +127,16 @@ for($preg=129,$nr=1; $nr<=24; $nr++,$preg+=97){  // numero de renglon, no exiten
 		//-----------------------------------
 		plotcentro($centroxy);
 		//if($DEPURANDO>=$DEPURACION_BAJA) print "renglon $nr, grupo $gpo, alveolo $n,  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
-		if($DEPURANDO>=$DEPURACION_BAJA) print "pregunta $preg\n";
-		if($DEPURANDO>=$DEPURACION_BAJA) print "*renglon ".($nr-1).", grupo ".(4-$gpo).", alveolo ".(4-$n).",  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
+		if($DEPURANDO>=$DEPURACION_MEDIA) print "pregunta $preg\n";
+		if($DEPURANDO>=$DEPURACION_MEDIA) print "*renglon ".($nr-1).", grupo ".(4-$gpo).", alveolo ".(4-$n).",  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
 	}
 	$x=$centroxy['x']-165;  // del centro de la resp 4 del grupo de la derecha a la respuesta D, punto de inicio de busqueda
 	$y=$centroxy['y'];
-	if($DEPURANDO>=$DEPURACION_BAJA) print "\n";
+	if($DEPURANDO>=$DEPURACION_MEDIA) print "\n";
    }  // sig gpo
 }
 
+if($DEPURANDO>=$DEPURACION_MEDIA){
 // impresion de centros de alveolos ordenados por pregunta
 for($np=57; $np<=150; $np++){
 	printf("pregunta $np, ");
@@ -143,6 +145,8 @@ for($np=57; $np<=150; $np++){
 	}
 	echo "\n";
 }
+}
+
 for($np=57; $np<=150; $np++){
         $respuesta[$np]=0;
         for($opcion=0; $opcion<=3; $opcion++){
@@ -154,12 +158,12 @@ for($np=57; $np<=150; $np++){
                         $respuesta [$np] = $respuesta[$np] | pow (2, $opcion);
                 //else
                 //      $respuesta[$np][$opcion]=0;
-                if($DEPURANDO>=2){
+                if($DEPURANDO>=$DEPURACION_BAJA){
                         echo "preg $np, opcion $opcion ($x,$y) gris:$gris\n";
                         if($gris<100000)
                                 echo "preg $np, opcion $opcion ($x,$y) gris:$gris RELLENADO\n";
                 }
-                elseif($DEPURANDO>=1){
+                elseif($DEPURANDO>=$DEPURACION_BAJA){
                         if($gris<100000)
                                 echo "preg $np, opcion $opcion ($x,$y) gris:$gris RELLENADO\n";
                 }
@@ -310,6 +314,8 @@ return;
 function marcatiempo($x,$y){
 	//investigar por las columnas a la vez para encontrar el borde izquierdo
 	//al encontrar un negro investigar a la derecha al menos 28 pixeles
+	global $NOINFO, $CONFIRMACIONES, $ERRORES, $ADVERTENCIAS, 
+		$DEPURACION_BAJA, $DEPURACION_MEDIA, $DEPURACION_ALTA, $DEPURANDO;
 	global $width, $pixeles;
 	$scx=$x; $scy=$y;
 	for($x=$scx; $x<=$scx+90; $x++){
@@ -329,10 +335,12 @@ function marcatiempo($x,$y){
 		echo "No se encontro marca de sincronizacion de tiempo\n";
 		exit;
 	}
+	if($DEPURANDO>=$DEPURACION_ALTA){
 	print "\tOk, posible marca de sinc de tiempo (borde mas a la izquierda) en $x,$y\n";
 	print "\tPosible Centro en ".$sinccol['x'].",".$sinccol['y']."\n";
+	}
 	$sinccol=ajusta_centro_rectangulo($sinccol);
-	print "Centro de sinc de col corregido en ".$sinccol['x'].",".$sinccol['y']."\n";
+	if($DEPURANDO>=$DEPURACION_ALTA) print "Centro de sinc de col corregido en ".$sinccol['x'].",".$sinccol['y']."\n";
 	return $sinccol;
 }
 
@@ -504,6 +512,8 @@ function _avanzar_izquierda($pxy,$cond,$color){
 	return array($x,$y);
 }
 function es_ruido($x,$y){
+        global $NOINFO, $CONFIRMACIONES, $ERRORES, $ADVERTENCIAS,
+               $DEPURACION_BAJA, $DEPURACION_MEDIA, $DEPURACION_ALTA, $DEPURANDO;
 	global $width,$pixeles;
 	$sumapix=0;
 	for($xi=$x-1; $xi<=$x; $xi++){  // alveolo de 28*28
@@ -511,10 +521,10 @@ function es_ruido($x,$y){
 			$offsetp = $yi*$width + $xi;  // en el arreglo lineal
 			$offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
 			$sumapix+=$pixeles[$offsetprgb];
-			printf("x:$xi,y:$yi gris:%d\n",$pixeles[$offsetprgb]);
+			if($DEPURANDO>=$DEPURACION_ALTA) printf("x:$xi,y:$yi gris:%d\n",$pixeles[$offsetprgb]);
 		}
 	}
-	printf("x:$x,y:$y prom:%d\n",(int)($sumapix/6));
+	if($DEPURANDO>=$DEPURACION_ALTA) printf("x:$x,y:$y prom:%d\n",(int)($sumapix/6));
 	return (int)($sumapix/6);
 }
 function plotcentro($xy){
