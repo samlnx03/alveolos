@@ -16,7 +16,12 @@ $DEPURACION_BAJA=4; $DEPURACION_MEDIA=5; $DEPURACION_ALTA=6;
 //$DEPURANDO=$DEPURACION_BAJA;
 $DEPURANDO=$ADVERTENCIAS;
 
-$filename='Imagen2.bmp';
+//$filename='Imagen2.bmp';
+if(!isset($argv[1])){
+	print "Se debe especificar el nombre de archivo como parametro\n";
+	exit(1);
+}
+$filename=$argv[1];
 $image = new Imagick();
 $image->readImage($filename);
 $height=$image->getImageHeight();
