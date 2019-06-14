@@ -13,6 +13,8 @@ $DEPURACION_BAJA=4; $DEPURACION_MEDIA=5; $DEPURACION_ALTA=6;
 $DEPURANDO=$DEPURACION_BAJA;
 //$DEPURANDO=$ADVERTENCIAS;
 
+$RELLENO=22*22*127;     // umbral para determinar alveolo relleno
+
 //$filename='Imagen1.bmp';
 if(!isset($argv[1])){
 	print "Se debe especificar el nombre de archivo como parametro\n";
@@ -79,7 +81,7 @@ for($c=1; $c<=6; $c++){ // columna
 			$respuesta[$np][$opcion]=0;
  */
 		if($DEPURANDO>=$DEPURACION_BAJA) echo "digito $c en posicion $r gris:$gris\n";
-		if($gris<100000){
+		if($gris<$RELLENO){
 			$nsol.="$r";
 			if($DEPURANDO>=$DEPURACION_BAJA) echo "digito $c en posicion $r gris:$gris RELLENADO\n";
 		}
@@ -129,7 +131,7 @@ for($alv=1; $alv<=5; $alv++){
 	$x=$centroxy['x'];
 	$y=$centroxy['y'];
 	$gris=gris_alveolo($x,$y,28,28);
-	if($gris<100000)  
+	if($gris<$RELLENO)  
 		$clave_exam.="$alv";
 	plot_alveolo($centroxy,28,28);
 	$x+=66;   // distancia entre centros
@@ -142,7 +144,7 @@ for($alv='A'; $alv<='C'; $alv++){
 	$x=$centroxy['x'];
 	$y=$centroxy['y'];
 	$gris=gris_alveolo($x,$y,28,28);
-	if($gris<100000)  
+	if($gris<$RELLENO)  
 		$clave_exam.="$alv";
 	plot_alveolo($centroxy,28,28);
 	$x+=66;   // distancia entre centros
@@ -260,18 +262,18 @@ for($np=1; $np<=56; $np++){
 		$y=$alveolos[$np][$opcion]['y'];
 		//$gris=convolv($x,$y);
 		$gris=gris_alveolo($x,$y,28,28);
-		if($gris<100000)
+		if($gris<$RELLENO)
 			//$respuesta[$np][$opcion]=1;
 			$respuesta [$np] = $respuesta[$np] | pow (2, ord($opcion) - ord ('A')); 
 		//else
 		//	$respuesta[$np][$opcion]=0;
 		if($DEPURANDO>=$DEPURACION_BAJA){
 			echo "preg $np, opcion $opcion ($x,$y) gris:$gris\n";
-			if($gris<100000)
+			if($gris<$RELLENO)
 				echo "preg $np, opcion $opcion ($x,$y) gris:$gris RELLENADO\n";
 		}
 		elseif($DEPURANDO>=$DEPURACION_BAJA){
-			if($gris<100000)
+			if($gris<$RELLENO)
 				echo "preg $np, opcion $opcion ($x,$y) gris:$gris RELLENADO\n";
 		}
 	}
