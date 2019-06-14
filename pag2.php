@@ -155,7 +155,8 @@ for($np=57; $np<=150; $np++){
         for($opcion=0; $opcion<=3; $opcion++){
                 $x=$alveolos[$np][$opcion]['x'];
                 $y=$alveolos[$np][$opcion]['y'];
-                $gris=convolv($x,$y);
+		///$gris=convolv($x,$y);
+		$gris=gris_alveolo($x,$y,28,28);
                 if($gris<$RELLENO)
                         //$respuesta[$np][$opcion]=1;
                         $respuesta [$np] = $respuesta[$np] | pow (2, $opcion);
@@ -164,7 +165,7 @@ for($np=57; $np<=150; $np++){
                 if($DEPURANDO>=$DEPURACION_BAJA){
                         echo "preg $np, opcion $opcion ($x,$y) gris:$gris ";
                         if($gris<$RELLENO){
-				plot_alveolo($alveolos[$np][$alv],40,40);
+				plot_alveolo($alveolos[$np][$opcion],40,40);
 				echo "RELLENADO\n";
 			}else
 				print "\n";
@@ -331,6 +332,24 @@ function convolv($x,$y){
 	}
 	return $sumapix;
 }
+
+function gris_alveolo($x,$y,$w,$h){
+	global $width,$pixeles;
+	$sumapix=0;
+	$xizq=$x-14+3;   // alveolo de 28, la mitad 14, 3 para no meter blancos de las esquinas
+	$xder=$x+14-3;
+	$ysup=$y-14+3;
+	$yinf=$y+14-3;
+	for($xi=$xizq; $xi<=$xder; $xi++){  // alveolo de 28*28
+		for($yi=$ysup; $yi<=$yinf; $yi++){
+			$offsetp = $yi*$width + $xi;  // en el arreglo lineal
+			$offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
+			$sumapix+=$pixeles[$offsetprgb];
+		}
+	}
+	return $sumapix;
+}
+
 function negros_a_la_derecha($x, $y){
 	global $NOINFO, $CONFIRMACIONES, $ERRORES, $ADVERTENCIAS, 
 		$DEPURACION_BAJA, $DEPURACION_MEDIA, $DEPURACION_ALTA, $DEPURANDO;
