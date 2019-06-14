@@ -13,9 +13,9 @@
 $NOINFO=0; $RESULTADOS=1; $CONFIRMACIONES=1; $ERRORES=2; $ADVERTENCIAS=3; 
 $DEPURACION_BAJA=4; $DEPURACION_MEDIA=5; $DEPURACION_ALTA=6;
 
-//$DEPURANDO=$DEPURACION_ALTA;
+$DEPURANDO=$DEPURACION_MEDIA;
 //$DEPURANDO=$ADVERTENCIAS;
-$DEPURANDO=$RESULTADOS;
+//$DEPURANDO=$RESULTADOS;
 
 $RELLENO=22*22*127;     // umbral para determinar alveolo relleno
 
@@ -94,7 +94,7 @@ for($preg=129,$nr=1; $nr<=24; $nr++,$preg+=97){  // numero de renglon, no exiten
    $pxy=salir_de_la_marca_de_tiempo($x,$y);
    for($gpo=1; $gpo<=4; $gpo++,$preg-=24){
 	if($DEPURANDO>=$DEPURACION_MEDIA) echo "GRUPO $gpo, Buscando 1er alveolo a la izq de la marca de tiempo\n";
-	$pxy=encontrar_alveolo_a_la_izq($pxy[0],$pxy[1]);
+	$pxy=encontrar_alveolo_a_la_izq($pxy[0]-10,$pxy[1]);
 	if($preg>150 AND $pxy[0]<1200){ // no exiten alveolos en el grupo de mas a la derecha, prego 150 y 151
 		$preg=$preg-24;
 		$gpo++;
