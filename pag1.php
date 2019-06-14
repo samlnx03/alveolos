@@ -33,7 +33,6 @@ $x=1640;
 $y=620;
 // afuera del rectangulo de alveolos de sol de ingreso lado derecho centro
 //
-
 $xy=avanzar_sobre_blancos_a_la_izq(array($x,$y));
 $xy[0]-=13; // meterse dentro del cuadro
 $xy=avanzar_sobre_blancos_hacia_arriba(array($xy[0],$xy[1]));
@@ -97,20 +96,61 @@ echo "*** numero de solicitud: $nsol\n";
 
 if($DEPURANDO>=$DEPURACION_ALTA) echo "Buscando centro de marca de tiempo 0 (rectangulos) del lado izquierdo\n";
 
-/*
+
 $x=40;   // justo arriba de la primer marca de tiempo lado izquierdo
 $y=450;
 $mt[0]=marcatiempo($x,$y);  // primer renglon de numero de solicitud de ingreso
-plotcentro($mt[0]);
+plot_mt($mt[0],30,12); // plotcentro($mt[0]);
 for($i=1; $i<=9; $i++){
 	if($DEPURANDO>=$DEPURACION_BAJA) echo "Buscando centro de marcas de tiempo $i\n";
 	$xy=salir_marca_tiempo_vert($mt[$i-1]);
 	$xy=encontrar_siguiente_marca_tiempo($xy);  // parte superior
 	$xy['y']+=6;
 	$mt[$i]=ajusta_centro_rectangulo_desde_centro($xy);
-	plotcentro($mt[$i]);
+	plot_mt($mt[$i],30,12); //plotcentro($mt[$i]);
 }
- */
+if($DEPURANDO>=$DEPURACION_BAJA){
+	echo "\n";
+	for($i=0; $i<=9; $i++)
+		plot_mt($mt[$i],30,12);   //   marcas de tiempo, ancho y alto
+}
+// la mt9 es importante por la clave del examen,  170 pixeles a la derecha.
+//
+//        CLAVE DE EXAMEN   un nume del 1 al 5 y una letra de A - C
+
+$clave_exam="";
+$x=$mt[9]['x']+170;
+$y=$mt[9]['y'];
+for($alv=1; $alv<=5; $alv++){
+	$centroxy['x']=$x;
+	$centroxy['y']=$y;
+	$centroxy=ajusta_centro($centroxy);
+	if($DEPURANDO>=$DEPURACION_MEDIA) print "clave de examen, centro alveolo $alv corregido en ".$centroxy['x'].",".$centroxy['y']."\n";
+	$x=$centroxy['x'];
+	$y=$centroxy['y'];
+	$gris=gris_alveolo($x,$y,28,28);
+	if($gris<100000)  
+		$clave_exam.="$alv";
+	plot_alveolo($centroxy,28,28);
+	$x+=66;   // distancia entre centros
+}
+for($alv='A'; $alv<='C'; $alv++){
+	$centroxy['x']=$x;
+	$centroxy['y']=$y;
+	$centroxy=ajusta_centro($centroxy);
+	if($DEPURANDO>=$DEPURACION_MEDIA) print "clave de examen, centro alveolo $alv corregido en ".$centroxy['x'].",".$centroxy['y']."\n";
+	$x=$centroxy['x'];
+	$y=$centroxy['y'];
+	$gris=gris_alveolo($x,$y,28,28);
+	if($gris<100000)  
+		$clave_exam.="$alv";
+	plot_alveolo($centroxy,28,28);
+	$x+=66;   // distancia entre centros
+}
+	//if(rellenado($centroxy)) 
+
+print "*** Clave de examen $clave_exam\n";
+
 
 // siguen dos marcas de tiempo sin importancia, a la altura del nombre y la otra para separacion entre columnas
 //
