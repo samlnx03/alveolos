@@ -201,7 +201,7 @@ for($n=1; $n<=24; $n++){
 if($DEPURANDO>=$DEPURACION_BAJA) {
 	$im = $image->getImage();
 	$im->importImagePixels(0, 0, $width, $height, "RGB", Imagick::PIXEL_CHAR, $pixelesdebug);
-	$im->writeImages('pag2.jpg', false);
+	$im->writeImages($filename.".jpg", false);
 }
 
 

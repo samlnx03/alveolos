@@ -318,7 +318,7 @@ if($DEPURANDO>=$DEPURACION_BAJA) {
 	echo "generando imagen de lineas horizontales sobre alveolos sin considerar rotacion y centros corregidos\n";
 	$im = $image->getImage();
 	$im->importImagePixels(0, 0, $width, $height, "RGB", Imagick::PIXEL_CHAR, $pixelesdebug);
-	$im->writeImages('pag1.jpg', false);
+	$im->writeImages($filename.".jpg", false);
 }
 
 exit;
