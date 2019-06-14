@@ -359,9 +359,10 @@ function marcatiempo($x,$y){
 	global $NOINFO, $RESULTADOS, $ERRORES, $ADVERTENCIAS, 
 		$DEPURACION_BAJA, $DEPURACION_MEDIA, $DEPURACION_ALTA, $DEPURANDO;
 	global $width, $pixeles;
+	global $filename;
 	$scx=$x; $scy=$y;
 	for($x=$scx; $x<=$scx+90; $x++){
-		for($y=$scy; $y<=$scy+50; $y++){   // antes 30
+		for($y=$scy; $y<=$scy+80; $y++){   // antes 30
 			$offsetp = $y*$width + $x;  // en el arreglo lineal
 			$offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
 			if($pixeles[$offsetprgb]<100){
@@ -374,9 +375,9 @@ function marcatiempo($x,$y){
 		}
 	}
 	if(!isset($sinccol)){
-		echo "No se encontro marca de sincronizacion de tiempo\n";
+		echo "\n$filename No se encontro marca de sincronizacion de tiempo\n";
 		echo "punto de partida ($scx,$scy)\n";
-		echo "max 90 pix a la derecha y 40 hacia abajo\n";
+		echo "max 90 pix a la derecha y 80 hacia abajo\n";
 		echo "termino en ($x,$y)\n";
 		exit;
 	}
