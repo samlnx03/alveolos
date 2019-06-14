@@ -13,8 +13,10 @@
 $NOINFO=0; $CONFIRMACIONES=1; $ERRORES=2; $ADVERTENCIAS=3; 
 $DEPURACION_BAJA=4; $DEPURACION_MEDIA=5; $DEPURACION_ALTA=6;
 
-//$DEPURANDO=$DEPURACION_BAJA;
-$DEPURANDO=$ADVERTENCIAS;
+$DEPURANDO=$DEPURACION_ALTA;
+//$DEPURANDO=$ADVERTENCIAS;
+
+$RELLENO=22*22*127;     // umbral para determinar alveolo relleno
 
 //$filename='Imagen2.bmp';
 if(!isset($argv[1])){
@@ -28,6 +30,7 @@ $height=$image->getImageHeight();
 $width = $image->getImageWidth();
 
 $pixeles = $image->exportImagePixels(0, 0, $width, $height, "RGB", Imagick::PIXEL_CHAR);
+$pixelesdebug=$image->exportImagePixels(0, 0, $width, $height, "RGB", Imagick::PIXEL_CHAR);
 
 /*
 es_ruido(704,1088);
@@ -51,9 +54,9 @@ for($n=1; $n<=24; $n++){
 		//if($DEPURANDO>=$DEPURACION_ALTA) print("\ty=$y ");
 		if($pixeles[$offsetprgb]>200)  // umbral de gris, TAL VEZ SEA NECESARIO FILTRO PASA BAJAS
 			break;
-		$pixeles[$offsetprgb]=255;
-		$pixeles[$offsetprgb+1]=0;
-		$pixeles[$offsetprgb+2]=0;
+		$pixelesdebug[$offsetprgb]=255;
+		$pixelesdebug[$offsetprgb+1]=0;
+		$pixelesdebug[$offsetprgb+2]=0;
 	}
 	if($DEPURANDO>=$DEPURACION_ALTA) {
 		print "terminan negros en x:$x, y:$y\n";
@@ -65,9 +68,9 @@ for($n=1; $n<=24; $n++){
 	        $offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
 		if($pixeles[$offsetprgb]<50)  // umbral de gris, TAL VEZ SEA NECESARIO FILTRO PASA BAJAS
 			break;
-		$pixeles[$offsetprgb]=0;
-		$pixeles[$offsetprgb+1]=0;
-		$pixeles[$offsetprgb+2]=255;
+		$pixelesdebug[$offsetprgb]=0;
+		$pixelesdebug[$offsetprgb+1]=0;
+		$pixelesdebug[$offsetprgb+2]=255;
 	}
 	$mt[$n]['ysup']=$y;
 	$y+=6;  // posible centro de la siguiente marca de tiempo
@@ -81,26 +84,16 @@ for($n=1; $n<=24; $n++){
 }
 
 
-if($DEPURANDO>=$DEPURACION_BAJA) {
-	$im = $image->getImage();
-	$im->importImagePixels(0, 0, $width, $height, "RGB", Imagick::PIXEL_CHAR, $pixeles);
-	$im->writeImages('converted0.jpg', false);
-}
-
 //-------------------------------------------------------
 // BUSQUEDA A LA IZQUIERDA DEL PRIMER ALVEOLO
 //
-// reiniciar con la imagen original
-$image->readImage($filename);
-$pixeles = $image->exportImagePixels(0, 0, $width, $height, "RGB", Imagick::PIXEL_CHAR);
-
 for($preg=129,$nr=1; $nr<=24; $nr++,$preg+=97){  // numero de renglon, no exiten la preg 151 y 152 (renglon 23 y 24, grupo de mas a la derecha)
    $x=$mt[$nr]['x'];	// centros de marca de tiempo
    $y=$mt[$nr]['y'];
    $pxy=salir_de_la_marca_de_tiempo($x,$y);
    for($gpo=1; $gpo<=4; $gpo++,$preg-=24){
 	if($DEPURANDO>=$DEPURACION_MEDIA) echo "GRUPO $gpo, Buscando 1er alveolo a la izq de la marca de tiempo\n";
-	$pxy=encontrar_alveolo_a_la_izq($x,$y);
+	$pxy=encontrar_alveolo_a_la_izq($pxy[0],$pxy[1]);
 	if($preg>150 AND $pxy[0]<1200){ // no exiten alveolos en el grupo de mas a la derecha, prego 150 y 151
 		$preg=$preg-24;
 		$gpo++;
@@ -115,7 +108,7 @@ for($preg=129,$nr=1; $nr<=24; $nr++,$preg+=97){  // numero de renglon, no exiten
 		//-----------------------------------
 		$alveolos[$preg][(4-1)]=$centroxy;
 		//-----------------------------------
-	plotcentro($centroxy);
+	//plot_alveolo($centroxy,28,28);
 	//if($DEPURANDO>=$DEPURACION_BAJA) print "renglon $nr, grupo $gpo, alveolo 1,  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
 		if($DEPURANDO>=$DEPURACION_MEDIA) print "pregunta $preg\n";
 	if($DEPURANDO>=$DEPURACION_MEDIA) print "*renglon ".($nr-1).", grupo ".(4-$gpo).", alveolo ".(4-1).",  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
@@ -130,13 +123,17 @@ for($preg=129,$nr=1; $nr<=24; $nr++,$preg+=97){  // numero de renglon, no exiten
 		//-----------------------------------
 		$alveolos[$preg][(4-$n)]=$centroxy;
 		//-----------------------------------
-		plotcentro($centroxy);
+		//plot_alveolo($centroxy,28,28);
 		//if($DEPURANDO>=$DEPURACION_BAJA) print "renglon $nr, grupo $gpo, alveolo $n,  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
 		if($DEPURANDO>=$DEPURACION_MEDIA) print "pregunta $preg\n";
 		if($DEPURANDO>=$DEPURACION_MEDIA) print "*renglon ".($nr-1).", grupo ".(4-$gpo).", alveolo ".(4-$n).",  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
 	}
-	$x=$centroxy['x']-165;  // del centro de la resp 4 del grupo de la derecha a la respuesta D, punto de inicio de busqueda
-	$y=$centroxy['y'];
+	//printf("termino el encontrar alveolos del grupo $gpo\n");
+   	//exit;
+	//$x=$centroxy['x']-165;  // del centro de la resp 4 del grupo de la derecha a la respuesta D, punto de inicio de busqueda
+	//$y=$centroxy['y'];
+	$pxy[0]=$centroxy['x']-165;  // del centro de la resp 4 del grupo de la derecha a la respuesta D, punto de inicio de busqueda
+	$pxy[1]=$centroxy['y'];
 	if($DEPURANDO>=$DEPURACION_MEDIA) print "\n";
    }  // sig gpo
 }
@@ -147,6 +144,7 @@ for($np=57; $np<=150; $np++){
 	printf("pregunta $np, ");
 	for($alv=0; $alv<=3; $alv++){
 		printf(" alveolo $alv, centro en (%d,%d)",$alveolos[$np][$alv]['x'],$alveolos[$np][$alv]['y']);
+		plot_alveolo($alveolos[$np][$alv],10,10);
 	}
 	echo "\n";
 }
@@ -158,19 +156,18 @@ for($np=57; $np<=150; $np++){
                 $x=$alveolos[$np][$opcion]['x'];
                 $y=$alveolos[$np][$opcion]['y'];
                 $gris=convolv($x,$y);
-                if($gris<100000)
+                if($gris<$RELLENO)
                         //$respuesta[$np][$opcion]=1;
                         $respuesta [$np] = $respuesta[$np] | pow (2, $opcion);
                 //else
                 //      $respuesta[$np][$opcion]=0;
                 if($DEPURANDO>=$DEPURACION_BAJA){
-                        echo "preg $np, opcion $opcion ($x,$y) gris:$gris\n";
-                        if($gris<100000)
-                                echo "preg $np, opcion $opcion ($x,$y) gris:$gris RELLENADO\n";
-                }
-                elseif($DEPURANDO>=$DEPURACION_BAJA){
-                        if($gris<100000)
-                                echo "preg $np, opcion $opcion ($x,$y) gris:$gris RELLENADO\n";
+                        echo "preg $np, opcion $opcion ($x,$y) gris:$gris ";
+                        if($gris<$RELLENO){
+				plot_alveolo($alveolos[$np][$alv],40,40);
+				echo "RELLENADO\n";
+			}else
+				print "\n";
                 }
         }
 }
@@ -200,120 +197,15 @@ for($n=1; $n<=24; $n++){
 }
 */
 
-//
 if($DEPURANDO>=$DEPURACION_BAJA) {
 	$im = $image->getImage();
-	$im->importImagePixels(0, 0, $width, $height, "RGB", Imagick::PIXEL_CHAR, $pixeles);
-	$im->writeImages('converted1.jpg', false);
+	$im->importImagePixels(0, 0, $width, $height, "RGB", Imagick::PIXEL_CHAR, $pixelesdebug);
+	$im->writeImages('pag2.jpg', false);
 }
+
 
 exit;
-
-//
-// ---------------------------------------------------------------------------------------------------------------
-//
-
-
-
-/*
-// vertical desde el nuevo centro
-$x=$sinccol['x'];
-for($y=$sinccol['y']; $y<1900; $y++){
-		$offsetp = $y*$width + $x;  // en el arreglo lineal
-		$offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
-		$pixeles[$offsetprgb]=0;
-		$pixeles[$offsetprgb+1]=0;
-		$pixeles[$offsetprgb+2]=0;
-}
- */
-//echo "para primera pregunta x,y:$x,$y\n";
-//$mt[1]=marcatiempo($x,$y);
-
-/*
-$x=$mt[1]['x']-20;
-for($npreg=2; $npreg<=24; $npreg++){
-	echo "Buscando centro de marcas de tiempo (rectangulos) del lado derecho PREG $npreg\n";
-	$y=$mt[$npreg-1]['y']+56;  // 56 es el espacio vertical entre rectangulos
-	$mt[$npreg]=marcatiempo($x,$y);
-}
- */
-
-
-
-
-// buscar los circulos de sincronizacion de columnas
-// 	3 puntos del lado izquierdo desde x=86 hasta x=248
-// 	desde Y=152 hasta Y=182
-// 
-// buscar el circulo de sinc izquierdo
-/*
-$x=50;
-$y=100;
-echo "Buscando centro de sincronizacion de columnas izquierdo\n";
-$sincizq=alveolo_sinc_col_izq($x,$y);  // centro x,y del alveolo de sinc de columnas izquierdo
-echo "\n";
-
-echo "Buscando centro de sincronizacion de columnas central\n";
-$x=$sincizq['x']+14+30;   // 14 de la mitad derecha del alveolo izquierdo, 38 del espacio entre alveolos
-$y=$sincizq['y'];
-$sinccentral=alveolo_sinc_col_central($x,$y);
-
-echo "Buscando centro de sincronizacion de columnas derecho\n";
-$x=$sinccentral['x']+14+30;   // 14 de la mitad derecha del alveolo izquierdo, 38 del espacio entre alveolos
-$y=$sinccentral['y'];
-$sincder=alveolo_sinc_col_central($x,$y);
-
-// probando lineas guias
-// g1a g1b g1c g1d   son las columnas del primer grupo
-// g2a g2b g2c g2d   son las columnas del segundo grupo
-// g3a g3b g3c g3d   son las columnas del tercer grupo
-// g4a g4b g4c g4d   son las columnas del cuarto grupo
-
-$distcols1=$sinccentral['x']-$sincizq['x'];
-$distcols2=$sincder['x']-$sinccentral['x'];
-$distcol=intdiv($distcols1+$distcols2,2);
-echo "dist1=$distcols1, dist2=$distcols2, prom:$distcol\n";
-
-$startx=$mt0['x'];
-$p1x=$mt[1]['x'];
-$p24x=$mt[24]['x'];
-$difx=$startx-$p24x;
-echo "tiempo: startx=$startx, p24x:$p24x, dif:$difx\n";
-
-//lineas horizontales desde los centros de las marcas de tiempo
-for($nr=1; $nr<=24; $nr++){
-	$y=$mt[$nr]['y'];
-	for($x=$sincizq['x']; $x<$mt[$nr]['x']; $x++){
-		$offsetp = $y*$width + $x;  // en el arreglo lineal
-		$offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
-		$pixeles[$offsetprgb]=0;
-		$pixeles[$offsetprgb+1]=0;
-		$pixeles[$offsetprgb+2]=0;
-	}
-}
-// linea ver sobre las marcas de tiempo tomando el centro de start
-// para evidenciar rotacion
-
-//for($x=$sincizq['x'] ; $x<=$mt0['x']; $x+=$distcol){
-for($x=$sincizq['x'] ; $x<=$mt0['x']; $x+=67){
-	$y=$sincizq['y'];
-	for($y=$sincizq['y']; $y<1900; $y++){
-		$offsetp = $y*$width + $x;  // en el arreglo lineal
-		$offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
-		$pixeles[$offsetprgb]=0;
-		$pixeles[$offsetprgb+1]=0;
-		$pixeles[$offsetprgb+2]=0;
-	}
-}
-
-$im = $image->getImage();
-$im->importImagePixels(0, 0, $width, $height, "RGB", Imagick::PIXEL_CHAR, $pixeles);
-$im->writeImages('converted.jpg', false);
-return;
- */
-
-
-
+/// --------------------------------------------------------------------------------------------------------------------
 ?>
 <?php
 function marcatiempo($x,$y){
@@ -321,7 +213,7 @@ function marcatiempo($x,$y){
 	//al encontrar un negro investigar a la derecha al menos 28 pixeles
 	global $NOINFO, $CONFIRMACIONES, $ERRORES, $ADVERTENCIAS, 
 		$DEPURACION_BAJA, $DEPURACION_MEDIA, $DEPURACION_ALTA, $DEPURANDO;
-	global $width, $pixeles;
+	global $width, $pixeles, $pixelesdebug;
 	$scx=$x; $scy=$y;
 	for($x=$scx; $x<=$scx+90; $x++){
 		for($y=$scy; $y<=$scy+30; $y++){
@@ -467,6 +359,7 @@ function _negros_a_la_derecha($offsetprgb){
 function salir_de_la_marca_de_tiempo($x,$y){
 	$pxy=array($x,$y);
 	$pxy=avanzar_sobre_negros_a_la_izq($pxy); // salir de la marca de tiempo
+	return $pxy;
 }
 
 function encontrar_alveolo_a_la_izq($x,$y){ // desde un punto blanco a la derecha del alveolo
@@ -487,9 +380,8 @@ function avanzar_sobre_blancos_a_la_izq($pxy){
 function _avanzar_izquierda($pxy,$cond,$color){
 	global $NOINFO, $CONFIRMACIONES, $ERRORES, $ADVERTENCIAS, 
 		$DEPURACION_BAJA, $DEPURACION_MEDIA, $DEPURACION_ALTA, $DEPURANDO;
-	global $width,$pixeles;
+	global $width,$pixeles,$pixelesdebug;
 
-	// salir de la marca de tiempo hacia la izquierda
 	if($DEPURANDO>=$DEPURACION_ALTA) echo "Avanzando a la izq desde ".$pxy[0].",".$pxy[1]." Detener cuando gris $cond $color\n";
 	$x=$pxy[0];
 	$y=$pxy[1];
@@ -509,10 +401,10 @@ function _avanzar_izquierda($pxy,$cond,$color){
 			if($pixeles[$offsetprgb]>$color)  // umbral de gris, TAL VEZ SEA NECESARIO FILTRO PASA BAJAS
 				break;
 		}
-		if($DEPURANDO>=$DEPURACION_ALTA) print("\t\trojo en $x,$y\n");
-		$pixeles[$offsetprgb]=255;
-		$pixeles[$offsetprgb+1]=0;
-		$pixeles[$offsetprgb+2]=0;
+		if($DEPURANDO>=$DEPURACION_BAJA) print("\t\trojo en $x,$y\n");
+		$pixelesdebug[$offsetprgb]=255;
+		$pixelesdebug[$offsetprgb+1]=0;
+		$pixelesdebug[$offsetprgb+2]=0;
 	}
 	return array($x,$y);
 }
@@ -532,10 +424,11 @@ function es_ruido($x,$y){
 	if($DEPURANDO>=$DEPURACION_ALTA) printf("x:$x,y:$y prom:%d\n",(int)($sumapix/6));
 	return (int)($sumapix/6);
 }
+/*
 function plotcentro($xy){
         global $NOINFO, $CONFIRMACIONES, $ERRORES, $ADVERTENCIAS,
                 $DEPURACION_BAJA, $DEPURACION_MEDIA, $DEPURACION_ALTA, $DEPURANDO;
-        global $width,$pixeles;
+        global $width,$pixeles,$pixelesdebug;
 
 	$x=$xy['x'];
 	$y=$xy['y'];
@@ -544,11 +437,52 @@ function plotcentro($xy){
 		for($yi=$y-1; $yi<$y+1; $yi++){
 			$offsetp = $yi*$width + $xi;  // en el arreglo lineal
 			$offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
-			$pixeles[$offsetprgb]=0;
-			$pixeles[$offsetprgb+1]=0;
-			$pixeles[$offsetprgb+2]=255;
+			$pixelesdebug[$offsetprgb]=0;
+			$pixelesdebug[$offsetprgb+1]=0;
+			$pixelesdebug[$offsetprgb+2]=255;
 		}
 	}
+}
+*/
+function plot_alveolo($xy,$w,$h){   // centro ancho alto
+	plot_mt($xy,$w,$h);
+}
+function plot_mt($xy,$w,$h){
+        global $NOINFO, $RESULTADOS, $ERRORES, $ADVERTENCIAS,
+                $DEPURACION_BAJA, $DEPURACION_MEDIA, $DEPURACION_ALTA, $DEPURANDO;
+        global $width,$pixeles,$pixelesdebug;
+
+        $x=$xy['x'];
+        $y=$xy['y'];
+	// $w wide,  $h height
+	for($xi=$x-(int)($w/2); $xi<$x+(int)($w/2); $xi++){  // marca de tiempo de 12 de alto x 30 de ancho
+        	$yi=$y-(int)($h/2);
+		$offsetp = $yi*$width + $xi;  // en el arreglo lineal
+                $offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
+                $pixelesdebug[$offsetprgb]=255;
+                $pixelesdebug[$offsetprgb+1]=0;
+		$pixelesdebug[$offsetprgb+2]=0;
+		$yi+=$h;
+		$offsetp = $yi*$width + $xi;  // en el arreglo lineal
+                $offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
+                $pixelesdebug[$offsetprgb]=255;
+                $pixelesdebug[$offsetprgb+1]=0;
+		$pixelesdebug[$offsetprgb+2]=0;
+	}
+	for($yi=$y-(int)($h/2); $yi<$y+(int)($h/2); $yi++){
+		$xi=$x-(int)($w/2);
+                $offsetp = $yi*$width + $xi;  // en el arreglo lineal
+                $offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
+                $pixelesdebug[$offsetprgb]=255;
+                $pixelesdebug[$offsetprgb+1]=0;
+		$pixelesdebug[$offsetprgb+2]=0;
+		$xi+=$w;
+                $offsetp = $yi*$width + $xi;  // en el arreglo lineal
+                $offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
+                $pixelesdebug[$offsetprgb]=255;
+                $pixelesdebug[$offsetprgb+1]=0;
+		$pixelesdebug[$offsetprgb+2]=0;
+        }
 }
 
 ?>
