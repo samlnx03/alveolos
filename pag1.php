@@ -61,7 +61,7 @@ if($DEPURANDO>=$DEPURACION_BAJA){
 	echo "\n";
 	for($r=0; $r<=9; $r++){
 		for($i=1; $i<=6; $i++){
-			plot_alveolo($solingreso[$r][$i],28,28);
+			//plot_alveolo($solingreso[$r][$i],28,28);
 			printf("renglon $r, alveolo $i en (%d,%d)\n",$solingreso[$r][$i]['x'], $solingreso[$r][$i]['y']);
 		}
 	}
@@ -82,6 +82,7 @@ for($c=1; $c<=6; $c++){ // columna
  */
 		if($DEPURANDO>=$DEPURACION_BAJA) echo "digito $c en posicion $r gris:$gris\n";
 		if($gris<$RELLENO){
+			plot_alveolo($solingreso[$r][$c],40,40);
 			$nsol.="$r";
 			if($DEPURANDO>=$DEPURACION_BAJA) echo "digito $c en posicion $r gris:$gris RELLENADO\n";
 		}
@@ -131,9 +132,11 @@ for($alv=1; $alv<=5; $alv++){
 	$x=$centroxy['x'];
 	$y=$centroxy['y'];
 	$gris=gris_alveolo($x,$y,28,28);
-	if($gris<$RELLENO)  
+	if($gris<$RELLENO){
 		$clave_exam.="$alv";
-	plot_alveolo($centroxy,28,28);
+		plot_alveolo($centroxy,40,40);  // resalta el relleno
+	}
+	//plot_alveolo($centroxy,28,28);
 	$x+=66;   // distancia entre centros
 }
 for($alv='A'; $alv<='C'; $alv++){
@@ -144,9 +147,11 @@ for($alv='A'; $alv<='C'; $alv++){
 	$x=$centroxy['x'];
 	$y=$centroxy['y'];
 	$gris=gris_alveolo($x,$y,28,28);
-	if($gris<$RELLENO)  
+	if($gris<$RELLENO){
 		$clave_exam.="$alv";
-	plot_alveolo($centroxy,28,28);
+		plot_alveolo($centroxy,40,40);  // resalta el relleno
+	}
+	//plot_alveolo($centroxy,28,28);
 	$x+=66;   // distancia entre centros
 }
 	//if(rellenado($centroxy)) 
@@ -205,7 +210,7 @@ for($preg=1,$nr=1; $nr<=14; $nr++,$preg++){
 	if($DEPURANDO>=$DEPURACION_MEDIA) print "centro corregido en ".$centroxy['x'].",".$centroxy['y']."\n";
 	$opcion='A';
 	$alveolos[$pregs][$opcion]=$centroxy;
-	plot_alveolo($centroxy,28,28);
+	plot_alveolo($centroxy,10,10);
 	//if(rellenado($centroxy)) 
 	if($DEPURANDO>=$DEPURACION_BAJA) print "renglon $nr, grupo $gpo, alveolo 1,  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
 	if($DEPURANDO>=$DEPURACION_BAJA) print "pregunta $pregs\n";
@@ -220,7 +225,7 @@ for($preg=1,$nr=1; $nr<=14; $nr++,$preg++){
 		$centroxy=ajusta_centro($centroxy);
 		if($DEPURANDO>=$DEPURACION_MEDIA) print "\talveolo $n centro corregido en ".$centroxy['x'].",".$centroxy['y']."\n";
 		$alveolos[$pregs][++$opcion]=$centroxy;
-		plot_alveolo($centroxy,28,28);
+		plot_alveolo($centroxy,10,10);
 		if($DEPURANDO>=$DEPURACION_BAJA) print "\trenglon $nr, grupo $gpo, alveolo $n,  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
 		//if($DEPURANDO>=$DEPURACION_BAJA) print "pregunta $pregs\n";
 		//if($DEPURANDO>=$DEPURACION_BAJA) print "*renglon ".($nr-1).", grupo ".($gpo).", alveolo ".($n).",  centro en ".$centroxy['x'].",".$centroxy['y']."\n";
@@ -268,13 +273,14 @@ for($np=1; $np<=56; $np++){
 		//else
 		//	$respuesta[$np][$opcion]=0;
 		if($DEPURANDO>=$DEPURACION_BAJA){
-			echo "preg $np, opcion $opcion ($x,$y) gris:$gris\n";
-			if($gris<$RELLENO)
-				echo "preg $np, opcion $opcion ($x,$y) gris:$gris RELLENADO\n";
-		}
-		elseif($DEPURANDO>=$DEPURACION_BAJA){
-			if($gris<$RELLENO)
-				echo "preg $np, opcion $opcion ($x,$y) gris:$gris RELLENADO\n";
+			$centroxy=array('x'=>$x, 'y'=>$y);
+			echo "preg $np, opcion $opcion ($x,$y) gris:$gris ";
+			if($gris<$RELLENO){
+				plot_alveolo($centroxy,40,40);
+				echo "RELLENADO\n";
+			}
+			else
+				echo "\n";
 		}
 	}
 }
@@ -294,6 +300,7 @@ for($np=1; $np<=56; $np++){
 }
 
 // lineas horizontales en la direccion de la marca de tiempo
+/*
 for($n=1; $n<=14; $n++){
    $x=$mtpreg[$n]['x'];
    $y=$mtpreg[$n]['y'];
@@ -305,7 +312,7 @@ for($n=1; $n<=14; $n++){
 		$pixelesdebug[$offsetprgb+2]=0;
    }
 }
-
+ */
 //
 if($DEPURANDO>=$DEPURACION_BAJA) {
 	echo "generando imagen de lineas horizontales sobre alveolos sin considerar rotacion y centros corregidos\n";
@@ -614,23 +621,6 @@ function _avanzar_izquierda($pxy,$cond,$color){
 // -------------------------------------------------------------------------------------------------
 function plot_alveolo($xy,$w,$h){   // centro ancho alto
 	plot_mt($xy,$w,$h);
-	/*
-        global $NOINFO, $RESULTADOS, $ERRORES, $ADVERTENCIAS,
-                $DEPURACION_BAJA, $DEPURACION_MEDIA, $DEPURACION_ALTA, $DEPURANDO;
-        global $width,$pixeles,$pixelesdebug;
-
-	$x=$xy['x'];
-	$y=$xy['y'];
-
-	for($xi=$x-1; $xi<$x+1; $xi++){  // alveolo de 28*28
-		for($yi=$y-1; $yi<$y+1; $yi++){
-			$offsetp = $yi*$width + $xi;  // en el arreglo lineal
-			$offsetprgb=$offsetp*3; // r,g,b  cada pixel son 3 elementos en el arreglo
-			$pixelesdebug[$offsetprgb]=255;
-			$pixelesdebug[$offsetprgb+1]=0;
-			$pixelesdebug[$offsetprgb+2]=0;
-		}
-	}*/
 }
 function plot_mt($xy,$w,$h){
         global $NOINFO, $RESULTADOS, $ERRORES, $ADVERTENCIAS,
