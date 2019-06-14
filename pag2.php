@@ -10,11 +10,12 @@
 // identifica numero de pregunta, numero de grupo, y centros de alveolos
 // hay un detalle con la pregunta 151 y 152 que no existen
 //
-$NOINFO=0; $CONFIRMACIONES=1; $ERRORES=2; $ADVERTENCIAS=3; 
+$NOINFO=0; $RESULTADOS=1; $CONFIRMACIONES=1; $ERRORES=2; $ADVERTENCIAS=3; 
 $DEPURACION_BAJA=4; $DEPURACION_MEDIA=5; $DEPURACION_ALTA=6;
 
-$DEPURANDO=$DEPURACION_ALTA;
+//$DEPURANDO=$DEPURACION_ALTA;
 //$DEPURANDO=$ADVERTENCIAS;
+$DEPURANDO=$RESULTADOS;
 
 $RELLENO=22*22*127;     // umbral para determinar alveolo relleno
 
@@ -173,12 +174,27 @@ for($np=57; $np<=150; $np++){
         }
 }
 
+function log2 ($x) {
+        return (log10 ($x) / log10 (2));
+}
+
+if($DEPURANDO>=$DEPURACION_BAJA){
 for($np=57; $np<=150; $np++){
 	printf("*** preg $np:");
 	printf("%d",$respuesta[$np]);
 	echo "\n";
 }
-
+}
+else if($DEPURANDO>=$RESULTADOS){
+for($np=57; $np<=150; $np++){
+                $value = (log10 ($respuesta[$np]) / log10 (2));
+                if (($value - (int) $value) > 0)
+                        printf (" ");
+                else
+                        printf ("%c", log2 ($respuesta[$np]) + 65);
+}
+	echo "\n";
+}
 
 /*
 // linea horizontal en la direccion de la marca de tiempo

@@ -10,8 +10,9 @@
 $NOINFO=0; $RESULTADOS=1; $ERRORES=2; $ADVERTENCIAS=3; 
 $DEPURACION_BAJA=4; $DEPURACION_MEDIA=5; $DEPURACION_ALTA=6;
 
-$DEPURANDO=$DEPURACION_BAJA;
+//$DEPURANDO=$DEPURACION_BAJA;
 //$DEPURANDO=$ADVERTENCIAS;
+$DEPURANDO=$RESULTADOS;
 
 $RELLENO=22*22*127;     // umbral para determinar alveolo relleno
 
@@ -89,7 +90,9 @@ for($c=1; $c<=6; $c++){ // columna
 		
 	}
 }
-echo "*** numero de solicitud: $nsol\n";
+if($DEPURANDO>=$DEPURACION_MEDIA)
+	echo "*** numero de solicitud: $nsol\n";
+
 //------------------------------------------------------------------------------------
 //fin de numero de solitud de ingreso
 
@@ -156,7 +159,12 @@ for($alv='A'; $alv<='C'; $alv++){
 }
 	//if(rellenado($centroxy)) 
 
-print "*** Clave de examen $clave_exam\n";
+if($DEPURANDO>=$DEPURACION_MEDIA)
+	print "*** Clave de examen $clave_exam\n";
+else if($DEPURANDO==$RESULTADOS){
+	print "$clave_exam";
+        print "$nsol";
+}
 
 
 // siguen dos marcas de tiempo sin importancia, a la altura del nombre y la otra para separacion entre columnas
@@ -293,11 +301,29 @@ for($np=1; $np<=56; $np++){
 	echo "\n";
 }
  */
-for($np=1; $np<=56; $np++){
-	printf("*** preg $np:");
-	printf("%d",$respuesta[$np]);
-	echo "\n";
+function log2 ($x) {
+	return (log10 ($x) / log10 (2));
 }
+
+if ($DEPURANDO>=$DEPURACION_BAJA)
+{
+	for ($np=1; $np<=56; $np++){
+		printf ("*** preg $np:");
+		printf ("%d", $respuesta[$np]);
+		echo "\n";
+	}
+}
+else if($DEPURANDO==$RESULTADOS){
+	for ($np=1; $np<=56; $np++){
+		$value = (log10 ($respuesta[$np]) / log10 (2));
+		if (($value - (int) $value) > 0)
+			printf (" ");
+		else
+	       		printf ("%c", log2 ($respuesta[$np]) + 65);
+	}
+        //echo "\n";   // para que el segundo script salga en la misma linea
+}
+	
 
 // lineas horizontales en la direccion de la marca de tiempo
 /*
