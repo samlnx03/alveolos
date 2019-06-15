@@ -10,9 +10,9 @@
 $NOINFO=0; $RESULTADOS=1; $ERRORES=2; $ADVERTENCIAS=3; 
 $DEPURACION_BAJA=4; $DEPURACION_MEDIA=5; $DEPURACION_ALTA=6;
 
-//$DEPURANDO=$DEPURACION_BAJA;
+$DEPURANDO=$DEPURACION_MEDIA;
 //$DEPURANDO=$ADVERTENCIAS;
-$DEPURANDO=$RESULTADOS;
+//$DEPURANDO=$RESULTADOS;
 
 $RELLENO=22*22*127;     // umbral para determinar alveolo relleno
 
@@ -103,7 +103,7 @@ if($DEPURANDO>=$DEPURACION_MEDIA)
 if($DEPURANDO>=$DEPURACION_ALTA) echo "Buscando centro de marca de tiempo 0 (rectangulos) del lado izquierdo\n";
 
 
-$x=40;   // justo arriba de la primer marca de tiempo lado izquierdo
+$x=53;   // justo arriba de la primer marca de tiempo lado izquierdo  < antes 40>
 $y=450;
 $mt[0]=marcatiempo($x,$y);  // primer renglon de numero de solicitud de ingreso
 plot_mt($mt[0],30,12); // plotcentro($mt[0]);
