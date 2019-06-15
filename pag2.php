@@ -13,9 +13,9 @@
 $NOINFO=0; $RESULTADOS=1; $CONFIRMACIONES=1; $ERRORES=2; $ADVERTENCIAS=3; 
 $DEPURACION_BAJA=4; $DEPURACION_MEDIA=5; $DEPURACION_ALTA=6;
 
-$DEPURANDO=$DEPURACION_MEDIA;
+//$DEPURANDO=$DEPURACION_MEDIA;
 //$DEPURANDO=$ADVERTENCIAS;
-//$DEPURANDO=$RESULTADOS;
+$DEPURANDO=$RESULTADOS;
 
 $RELLENO=22*22*127;     // umbral para determinar alveolo relleno
 
@@ -186,14 +186,17 @@ for($np=57; $np<=150; $np++){
 }
 }
 else if($DEPURANDO>=$RESULTADOS){
-for($np=57; $np<=150; $np++){
-                $value = (log10 ($respuesta[$np]) / log10 (2));
-                if (($value - (int) $value) > 0)
+	for($np=57; $np<=120; $np++){
+                $r = $respuesta[$np] & 15;
+                for ($cont = 0, $b=0; $b < 4; $b++)
+                        if ($r & pow (2, $b))
+                                $cont++;
+                if ($cont == 0)
                         printf (" ");
                 else
                         printf ("%c", log2 ($respuesta[$np]) + 65);
-}
-	echo "\n";
+        }
+        echo "\n";
 }
 
 /*
