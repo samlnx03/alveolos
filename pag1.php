@@ -103,7 +103,7 @@ if($DEPURANDO>=$DEPURACION_MEDIA)
 if($DEPURANDO>=$DEPURACION_ALTA) echo "Buscando centro de marca de tiempo 0 (rectangulos) del lado izquierdo\n";
 
 
-$x=40;   // justo arriba de la primer marca de tiempo lado izquierdo
+$x=53;   // justo arriba de la primer marca de tiempo lado izquierdo  <antes 40, hace 2 versiones>
 $y=450;
 $mt[0]=marcatiempo($x,$y);  // primer renglon de numero de solicitud de ingreso
 plot_mt($mt[0],30,12); // plotcentro($mt[0]);
