@@ -98,6 +98,13 @@ for($c=1; $c<=6; $c++){ // columna
 if($DEPURANDO>=$DEPURACION_MEDIA)
 	echo "*** numero de solicitud: $nsol\n";
 
+if(!$solicitud_archivo=fopen(dirname($filename)."-solicitud-archivo.txt", "a")){
+	echo "No se pudo abrir archivo para guardar la relacion del # de solicitud al nombre de archivo\n";
+	exit(1);
+}
+fwrite($solicitud_archivo,"$nsol $filename\n");
+fclose($solicitud_archivo);
+
 //------------------------------------------------------------------------------------
 //fin de numero de solitud de ingreso
 
