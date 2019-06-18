@@ -219,6 +219,8 @@ for($n=1; $n<=24; $n++){
 
 if($DEPURANDO>=$DEPURACION_BAJA) {
 	$im = $image->getImage();
+	$im->setImageColorspace (imagick::COLORSPACE_RGB);
+	$im->setImageFormat("jpeg");
 	$im->importImagePixels(0, 0, $width, $height, "RGB", Imagick::PIXEL_CHAR, $pixelesdebug);
 	$im->writeImages($filename.".jpg", false);
 }
