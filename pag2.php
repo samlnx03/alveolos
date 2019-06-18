@@ -25,6 +25,11 @@ if(!isset($argv[1])){
 	exit(1);
 }
 $filename=$argv[1];
+
+if(isset($argv[2])){
+	$DEPURANDO=$argv[2]+0;
+}
+
 $image = new Imagick();
 $image->readImage($filename);
 $height=$image->getImageHeight();
