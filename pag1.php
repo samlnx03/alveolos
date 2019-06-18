@@ -19,7 +19,7 @@ $RELLENO=22*22*127;     // umbral para determinar alveolo relleno
 
 //$filename='Imagen1.bmp';
 if(!isset($argv[1])){
-	print "Se debe especificar el nombre de archivo como parametro\n";
+	print "Sintaxis: php ".$argv[0]." [debug level (0-6)]\n";
 	exit(1);
 }
 $filename=$argv[1];
