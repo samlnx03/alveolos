@@ -10,9 +10,9 @@ $end=$argv[3];
 
 for ($i=$start; $i<=$end ; $i++){
 	if($i%2){ // impar
-		printf("php pag1.php $prefijo"."_%03d.pgm\n",$i);
+		printf("php pag1.php $prefijo"."/%03d.pgm\n",$i);
 	} else {
-		printf("php pag2.php $prefijo"."_%03d.pgm\n",$i);
+		printf("php pag2.php $prefijo"."/%03d.pgm\n",$i);
 	}
 }
 
