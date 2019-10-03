@@ -1,0 +1,9 @@
+python Calificar_Licenciatura.py mediosup3ra Calif-tercera/
+
+mediosup3ra es el nombre del archivo con los resultador del scanner
+	se asume extension .txt
+	se asume que esta en el directorio Elem_Evaluacion
+
+Calif-tercera/ es el directorio para poner los resultados (hojas de calculo)
+
+

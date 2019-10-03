@@ -1,0 +1,3 @@
+tipo_exa*1-2
+ficha*3-8
+respuestas*9-128

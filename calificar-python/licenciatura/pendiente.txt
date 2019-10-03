@@ -1,0 +1,1 @@
+•	Archivo de los rangos de la hoja de respuestas: en este archivo coloca el nombre del área seguido de un asterisco y luego del rango de esta área separado por un guion de la siguiente manera:
